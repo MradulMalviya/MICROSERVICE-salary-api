@@ -1,0 +1,61 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-deployment
+  labels:
+    app: notification
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notification
+  template:
+    metadata:
+      labels:
+        app: notification
+    spec:
+      containers:
+      - name: notification-container
+        image: mradul690/microservice-salary-api-empms-notification:1.0
+        ports:
+        - containerPort: 8084
+        env:
+        - name: CONFIG_FILE
+          value: "/app/config.yaml"
+        - name: SMTP_USERNAME
+          value: "mradul690"
+        - name: SMTP_PASSWORD
+          value: "Fastrack?123"
+        - name: SMTP_SERVER
+          value: "mail.smtp.com"
+        - name: SMTP_PORT
+          value: "25"
+        - name: ELASTIC_USERNAME
+          value: "elastic"
+        - name: ELASTIC_PASSWORD
+          value: "elastic"
+        - name: ELASTIC_HOST
+          value: "empms-es"
+        - name: ELASTIC_PORT
+          value: "9200"
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8084
+    targetPort: 8084
+  selector:
+    app: notification
