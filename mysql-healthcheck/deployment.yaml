@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-healthcheck
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-healthcheck
+  template:
+    metadata:
+      labels:
+        app: db-healthcheck
+    spec:
+      containers:
+      - name: db-healthcheck
+        image: mradul690/microservice-salary-api-empms-db_healthcheck:1.0
+        env:
+          - name: MYSQL_USERNAME
+            value: "root"
+          - name: MYSQL_PASSWORD
+            value: "password"
+          - name: MYSQL_HOST
+            value: "empms-db"
+          - name: MYSQL_PORT
+            value: "3306"
+          - name: MYSQL_DATABASE
+            value: "attendancedb"
+          - name: SLEEP_INTERVAL
+            value: "10"
+          - name: MAX_RETRIES
+            value: "10"
+        imagePullPolicy: IfNotPresent
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-healthcheck-service
+spec:
+  selector:
+    app: db-healthcheck
+  ports:
+    - protocol: TCP
+      port: 8085   # Adjust the port as needed
+      targetPort: 8085
+  type: ClusterIP
