@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch-deployment
+  labels:
+    app: elasticsearch
+spec:
+  replicas: 1  # Only one replica for single-node cluster
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+      - name: elasticsearch-container
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0  # Docker image name
+        env:
+        - name: ES_JAVA_OPTS
+          value: "-Xms512m -Xmx512m"  # Java memory settings
+        - name: ELASTIC_PASSWORD
+          value: "elastic"  # Elasticsearch password
+        ports:
+        - containerPort: 9200  # Default Elasticsearch port
+        volumeMounts:
+        - name: elasticsearch-config
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          subPath: elasticsearch.yml
+      volumes:
+      - name: elasticsearch-config
+        configMap:
+          name: elasticsearch-config  # Reference to ConfigMap
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9200
+    targetPort: 9200
+  selector:
+    app: elasticsearch
