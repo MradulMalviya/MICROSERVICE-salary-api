@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: salary-deployment
+  labels:
+    app: salary
+spec:
+  replicas: 3  # Adjust replica count as needed
+  selector:
+    matchLabels:
+      app: salary
+  template:
+    metadata:
+      labels:
+        app: salary
+    spec:
+      containers:
+      - name: salary-container
+        image: mradul690/microservice-salary-api-empms-salary:1.0  # Docker image name
+        ports:
+        - containerPort: 8082  # Port exposed in Dockerfile
+        env:
+        - name: CONFIG_FILE
+          value: "/app/config.yaml"  # Environment variable from Dockerfile
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: salary-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8082
+    targetPort: 8082
+  selector:
+    app: salary
