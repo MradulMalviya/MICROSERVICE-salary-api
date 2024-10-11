@@ -1,7 +1,7 @@
 ---
 smtp:
-  from: "kaifshakeel555@gmail.com"
-  username: "kaif"
+  from: "mradul690@gmail.com"
+  username: "mradul690"
   password: "root"
   smtp_server: "mail.smtp.com"
   smtp_port: "25"
