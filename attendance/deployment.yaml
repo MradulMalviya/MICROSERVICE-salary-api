@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: attendance-deployment
+  labels:
+    app: attendance
+spec:
+  replicas: 3  # Adjust replica count as needed
+  selector:
+    matchLabels:
+      app: attendance
+  template:
+    metadata:
+      labels:
+        app: attendance
+    spec:
+      containers:
+      - name: attendance-container
+        image: mradul690/microservice-salary-api-empms-attendance:1.0  # Replace with the Docker image name/id
+        ports:
+        - containerPort: 8081  # Port exposed in Dockerfile
+        env:
+        - name: CONFIG_FILE
+          value: "/app/config.yaml"  # Environment variable from Dockerfile
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: attendance-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8081
+    targetPort: 8081
+  selector:
+    app: attendance
